@@ -1,0 +1,11 @@
+{
+  "name": "Pocket Play",
+  "short_name": "Pocket Play",
+  "lang": "fr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f4ff",
+  "theme_color": "#7357ed",
+  "description": "Cinq mini-jeux colorés, sans publicité."
+}

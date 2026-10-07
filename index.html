@@ -1,0 +1,844 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#7357ed">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Pocket Play">
+<link rel="manifest" href="./manifest.webmanifest">
+<title>Pocket Play</title>
+<style>
+*{box-sizing:border-box}
+:root{--ink:#252342;--purple:#7357ed;--muted:#77748e}
+body{margin:0;background:#f6f4ff;color:var(--ink);font:16px system-ui}
+main{max-width:680px;margin:auto;padding:22px 18px max(30px,env(safe-area-inset-bottom))}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-size:25px;font-weight:850;letter-spacing:-1px}
+.brand span{color:var(--purple)}
+.status{font-size:11px;background:#e8e2ff;color:#6248be;padding:8px 11px;border-radius:30px}
+h1{font-size:clamp(31px,7vw,43px);line-height:1.1;margin:28px 0 12px}
+h2{font-size:25px;margin:8px 0}
+p{color:var(--muted);line-height:1.65}
+button{font:inherit;cursor:pointer;border:0;border-radius:13px;padding:12px 17px;
+background:var(--purple);color:white;font-weight:700}
+button:disabled{opacity:.4;cursor:default}
+button:focus-visible{outline:3px solid #ffb52f;outline-offset:3px}
+.secondary{background:#eae6fa;color:#594a87}
+.hidden{display:none!important}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:25px}
+.game-card{text-align:left;min-height:210px;position:relative;overflow:hidden;
+color:white;border-radius:24px;padding:22px;box-shadow:0 10px 25px #53429617}
+.game-card:nth-child(1){background:linear-gradient(135deg,#8b62ef,#5e42cf)}
+.game-card:nth-child(2){background:linear-gradient(135deg,#ff9364,#ef5b71)}
+.game-card:nth-child(3){background:linear-gradient(135deg,#36bddc,#3682d9)}
+.game-card:nth-child(4){background:linear-gradient(135deg,#42c698,#1b9c81)}
+.game-card:nth-child(5){background:linear-gradient(135deg,#ed73c3,#bf56d8)}
+.game-card::after{content:"";position:absolute;width:140px;height:140px;border-radius:50%;
+right:-55px;top:-45px;background:#ffffff14}
+.game-card .icon{display:block;font-size:45px;margin-bottom:16px}
+.game-card strong{display:block;font-size:20px}
+.game-card small{display:block;margin-top:10px;font-size:12px;font-weight:500;color:#fffe}
+.tag{display:inline-block;font-size:11px;padding:5px 9px;background:#fff2;
+border-radius:20px;margin-top:14px}
+.home-note{font-size:12px;text-align:center;margin-top:25px}
+.game-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:24px}
+.controls{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}
+.controls button{font-size:13px;padding:10px 13px}
+.info{display:flex;justify-content:space-between;align-items:center;gap:10px;
+padding:13px 16px;background:white;border-radius:15px;font-size:13px}
+.info strong{font-size:17px;color:var(--purple)}
+.instructions{font-size:13px;min-height:42px;margin:15px 0}
+.arena{background:white;border:1px solid #e5dff5;border-radius:24px;
+padding:22px;box-shadow:0 12px 35px #53429609;position:relative}
+#toast{min-height:43px;color:#65568e;text-align:center;font-size:13px;padding:12px 4px}
+footer{font-size:11px;text-align:center;color:#9891ac;margin-top:24px}
+button{transition:transform .15s,background .15s}
+button:active:not(:disabled){transform:scale(.97)}
+.tubes{display:flex;justify-content:center;gap:17px;flex-wrap:wrap;padding:15px 0}
+.tube{background:transparent;padding:0;color:#777;width:63px;border-radius:0}
+.glass{height:137px;padding:6px;border:3px solid #c3c1e6;border-top:0;
+border-radius:0 0 22px 22px;display:flex;flex-direction:column-reverse;gap:2px;
+background:#f6f5ff;overflow:hidden;transition:transform .2s,border-color .2s}
+.layer{height:28px;flex-shrink:0;border-radius:4px;color:#fff;
+font-size:12px;font-weight:750;display:grid;place-items:center;text-shadow:0 1px 2px #0008}
+.tube.selected .glass{transform:translateY(-13px);border-color:#7357ed}
+.tube small{display:block;font-size:11px;margin-top:12px}
+.square{width:100%;max-width:430px;aspect-ratio:1;margin:auto;position:relative;
+border-radius:14px;background:#eeecfa}
+.parking{background-color:#edf0f9;
+background-image:linear-gradient(#d4d8e8 1px,transparent 1px),
+linear-gradient(90deg,#d4d8e8 1px,transparent 1px);background-size:16.6667% 16.6667%}
+.car{position:absolute;border:3px solid #fff9;border-radius:12px;padding:0;
+color:white;box-shadow:0 3px 5px #0002;touch-action:none;display:grid;place-items:center;
+font-size:19px;transition:none}
+.car.selected{outline:3px solid #7357ed;outline-offset:1px;z-index:2}
+.exit{text-align:right;color:#ef5b71;font-size:12px;margin-bottom:12px;font-weight:750}
+.car-buttons{display:flex;justify-content:center;gap:8px;margin-top:18px}
+.car-buttons button{font-size:21px;min-width:55px}
+.cell-grid{display:grid;gap:4px;position:relative}
+.cell{aspect-ratio:1;padding:0;border-radius:7px;background:#eeecfa;color:#6f6798;
+min-width:0;min-height:0;position:relative;font-size:clamp(16px,5vw,26px)}
+.cell.filled{box-shadow:inset 0 -3px 0 #0001}
+.cell.preview{outline:2px solid #7357ed;outline-offset:-2px}
+.pieces{display:flex;justify-content:space-around;gap:10px;margin-top:23px;min-height:90px}
+.piece{background:#f3f0ff;padding:12px;border:2px solid transparent;
+border-radius:14px;touch-action:none;align-self:center;min-width:75px}
+.piece.selected{border-color:#7357ed;background:#e8e0ff}
+.mini{display:grid;gap:3px;justify-content:center}
+.mini span{width:16px;height:16px;border-radius:4px}
+.ghost{position:fixed;pointer-events:none;z-index:20;display:grid;gap:4px;opacity:.85}
+.ghost span{border-radius:7px}
+.arrow{background:#effaf5;color:#1b997c;font-weight:850}
+.arrow.hinted{outline:3px solid #ffba34;outline-offset:-3px}
+.arrow.blocked{background:#ffe5e9;color:#df5c78}
+.arrow.gone{opacity:0;transition:transform .25s,opacity .25s}
+.flow-board{touch-action:none}
+.flow-cell{background:#f4f1fc;color:white;font-size:14px}
+.endpoint{width:70%;height:70%;border-radius:50%;display:grid;place-items:center;
+position:absolute;left:15%;top:15%;font-weight:800;border:3px solid white;
+box-shadow:0 2px 5px #0002;z-index:2;text-shadow:0 1px 2px #0005}
+.flow-line{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+.flow-cell.active{outline:2px solid #7357ed;outline-offset:-2px}
+dialog{border:0;border-radius:24px;padding:28px;width:min(90vw,430px);
+color:var(--ink);box-shadow:0 25px 100px #24144d44}
+dialog::backdrop{background:#24144d66;backdrop-filter:blur(5px)}
+dialog .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.level-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:20px 0}
+.level-grid button{padding:12px 0}
+.level-grid button.done{background:#28af8b}
+.level-grid button.current{outline:3px solid #ffb52f}
+@media(max-width:390px){.game-card{padding:16px;min-height:195px}.game-card strong{font-size:17px}
+.arena{padding:16px}.tubes{gap:12px}.tube{width:57px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+<header><div class="brand">Pocket <span>Play.</span> 🎮</div>
+<span id="offline" class="status">Sans publicité</span></header>
+
+<section id="home">
+<h1>Une petite pause.<br>Un grand plaisir.</h1>
+<p>Cinq jeux à emporter. Choisis selon ton humeur.</p>
+<div id="games" class="grid"></div>
+<p class="home-note">Sur iPhone : ouvre dans Safari, puis Partager → Sur l’écran d’accueil.</p>
+</section>
+
+<section id="play" class="hidden">
+<div class="game-top"><div><h2 id="title"></h2><span id="subtitle"></span></div>
+<button id="homeButton" class="secondary">Accueil</button></div>
+<div class="controls">
+<button id="levels" class="secondary">Niveaux</button>
+<button id="restart" class="secondary">Recommencer</button>
+<button id="undo" class="secondary">Annuler</button>
+<button id="hint" class="secondary">Aide</button>
+</div>
+<div class="info"><span id="metric"></span><strong id="progress"></strong></div>
+<p id="instructions" class="instructions"></p>
+<div id="arena" class="arena"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+</section>
+<footer id="saveInfo">Progression sauvegardée sur cet appareil.</footer>
+</main>
+
+<dialog id="result">
+<div style="font-size:45px" id="resultIcon">🎉</div>
+<h2 id="resultTitle"></h2><p id="resultText"></p>
+<div class="actions">
+<button id="next">Niveau suivant</button>
+<button id="replay" class="secondary">Rejouer</button>
+<button id="resultHome" class="secondary">Accueil</button>
+</div>
+</dialog>
+<dialog id="levelDialog">
+<h2>Choisis un niveau</h2><p>Les niveaux déjà atteints restent disponibles.</p>
+<div id="levelList" class="level-grid"></div>
+<button id="closeLevels" class="secondary">Fermer</button>
+</dialog>
+
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const palette=['#8b5bea','#f16681','#28b998','#edaa35','#369ee0','#df6bc2'];
+const colorNames=['violet','rose','vert','jaune','bleu','fuchsia'];
+const games=[
+ {id:'water',name:'Tri de couleurs',icon:'🧪',tag:'Zen & logique'},
+ {id:'parking',name:'Parking bloqué',icon:'🚗',tag:'Libère le passage'},
+ {id:'blocks',name:'Puzzle de blocs',icon:'🧩',tag:'Score & combos'},
+ {id:'arrows',name:'Flèches à libérer',icon:'➡️',tag:'Trouve le bon ordre'},
+ {id:'flow',name:'Relier les couleurs',icon:'🌈',tag:'Dessine les chemins'}
+];
+const key='pocket-play-v1';
+let progress={water:0,parking:0,arrows:0,flow:0,blockBest:0};
+try{
+ const data=JSON.parse(localStorage.getItem(key)||'{}');
+ for(const id of ['water','parking','arrows','flow']){
+   if(Number.isInteger(data[id]))progress[id]=Math.max(0,Math.min(20,data[id]));
+ }
+ if(Number.isFinite(data.blockBest))progress.blockBest=Math.max(0,data.blockBest);
+}catch{$('saveInfo').textContent='Sauvegarde indisponible dans ce navigateur.'}
+let mode='',level=0,G=null,render=null,runId=0,locked=false;
+let drag=null,ghost=null;
+const copy=x=>JSON.parse(JSON.stringify(x));
+function el(tag,cls,text){
+ const n=document.createElement(tag);if(cls)n.className=cls;
+ if(text!==undefined)n.textContent=text;return n;
+}
+function button(text,action,cls='secondary'){
+ const b=el('button',cls,text);b.type='button';b.onclick=action;return b;
+}
+function save(){
+ try{localStorage.setItem(key,JSON.stringify(progress))}
+ catch{$('saveInfo').textContent='Sauvegarde indisponible : garde cette page ouverte.'}
+}
+function say(text){$('toast').textContent=text}
+function rng(seed){
+ return()=>{
+   seed|=0;seed=seed+0x6D2B79F5|0;
+   let t=Math.imul(seed^seed>>>15,1|seed);
+   t^=t+Math.imul(t^t>>>7,61|t);
+   return((t^t>>>14)>>>0)/4294967296;
+ };
+}
+function shuffle(a,r){
+ for(let i=a.length-1;i>0;i--){
+   const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]];
+ }
+ return a;
+}
+function home(){
+ runId++;locked=false;mode='';
+ if(ghost)ghost.remove();ghost=null;drag=null;
+ $('result').close();$('levelDialog').close();
+ $('home').classList.remove('hidden');$('play').classList.add('hidden');
+ $('games').replaceChildren();
+ for(const game of games){
+   const b=button('',()=>start(game.id),'game-card');
+   b.append(el('span','icon',game.icon),el('strong','',game.name));
+   b.append(el('small','',game.id==='blocks'?
+     'Record : '+progress.blockBest+' · Palier '+(1+Math.floor(progress.blockBest/100)):
+     progress[game.id]+' / 20 niveaux réussis'));
+   b.append(el('span','tag',game.tag));$('games').appendChild(b);
+ }
+ window.scrollTo({top:0,behavior:'instant'});
+}
+function start(id,chosen){
+ if(ghost)ghost.remove();ghost=null;drag=null;
+ runId++;locked=false;mode=id;
+ level=chosen??Math.min(progress[id]||0,19);
+ $('result').close();$('levelDialog').close();
+ $('home').classList.add('hidden');$('play').classList.remove('hidden');
+ $('arena').replaceChildren();say('');
+ const game=games.find(g=>g.id===id);
+ $('title').textContent=game.icon+' '+game.name;
+ $('subtitle').textContent=id==='blocks'?'Une partie, un score, une revanche.':'Niveau '+(level+1)+' / 20';
+ $('levels').classList.toggle('hidden',id==='blocks');
+ $('undo').classList.toggle('hidden',id==='blocks');
+ $('hint').classList.toggle('hidden',id==='blocks');
+ if(id==='water')initWater();
+ if(id==='parking')initParking();
+ if(id==='blocks')initBlocks();
+ if(id==='arrows')initArrows();
+ if(id==='flow')initFlow();
+ window.scrollTo({top:0,behavior:'instant'});
+}
+function recordHistory(){
+ G.history.push(copy(mode==='flow'?{paths:G.paths}:{board:G.board,moves:G.moves}));
+ $('undo').disabled=false;
+}
+function undo(){
+ if(locked||!G.history.length)return;
+ const old=G.history.pop();
+ if(mode==='flow'){G.paths=old.paths;G.active=-1}
+ else{G.board=old.board;G.moves=old.moves;G.selected=-1}
+ render();$('undo').disabled=!G.history.length;say('Dernier mouvement annulé.');
+}
+function win(){
+ if(locked)return;locked=true;
+ progress[mode]=Math.max(progress[mode],level+1);save();
+ $('resultIcon').textContent='🎉';
+ $('resultTitle').textContent='Bien joué !';
+ $('resultText').textContent=level===19?
+ 'Les 20 niveaux sont réussis. Tu peux les rejouer ou changer de jeu.':
+ 'Niveau '+(level+1)+' terminé. Le suivant est débloqué !';
+ $('next').textContent=level===19?'Choisir un autre jeu':'Niveau suivant';
+ $('result').showModal();
+}
+function openLevels(){
+ $('levelList').replaceChildren();
+ for(let i=0;i<20;i++){
+   const b=button(String(i+1),()=>start(mode,i),'');
+   b.disabled=i>progress[mode];
+   if(i<progress[mode])b.classList.add('done');
+   if(i===level)b.classList.add('current');
+   $('levelList').appendChild(b);
+ }
+ $('levelDialog').showModal();
+}
+$('homeButton').onclick=home;
+$('restart').onclick=()=>start(mode,level);
+$('undo').onclick=undo;$('levels').onclick=openLevels;
+$('closeLevels').onclick=()=>$('levelDialog').close();
+$('resultHome').onclick=home;
+$('replay').onclick=()=>start(mode,level);
+$('next').onclick=()=>mode==='blocks'||level===19?home():start(mode,level+1);
+
+/* TRI DE COULEURS : génération depuis une position résolue,
+   avec des mouvements inverses garantissant une solution. */
+function topRun(t){
+ if(!t.length)return 0;let n=1;
+ while(n<t.length&&t[t.length-1-n]===t.at(-1))n++;
+ return n;
+}
+function pour(board,i,j){
+ if(i===j||!board[i].length||board[j].length===4||
+    (board[j].length&&board[j].at(-1)!==board[i].at(-1)))return 0;
+ const n=Math.min(topRun(board[i]),4-board[j].length);
+ board[j].push(...board[i].splice(board[i].length-n));return n;
+}
+function waterLevel(lv){
+ const r=rng(lv+701),colors=Math.min(6,2+Math.floor(lv/3));
+ const board=Array.from({length:colors},(_,i)=>[i,i,i,i]).concat([[],[]]);
+ let last=null;
+ for(let step=0;step<18+lv*4;step++){
+   const options=[];
+   for(let i=0;i<board.length;i++){
+     if(!board[i].length)continue;
+     let max=topRun(board[i]);if(max<board[i].length)max--;
+     for(let j=0;j<board.length;j++){
+       if(i===j||board[j].length===4||board[j].at(-1)===board[i].at(-1)||
+          (last&&last[0]===j&&last[1]===i))continue;
+       for(let n=1;n<=Math.min(max,4-board[j].length);n++)options.push([i,j,n]);
+     }
+   }
+   if(!options.length)break;
+   const[i,j,n]=options[Math.floor(r()*options.length)];
+   board[j].push(...board[i].splice(board[i].length-n));last=[i,j];
+ }
+ return board;
+}
+function initWater(){
+ G={board:waterLevel(level),moves:0,selected:-1,history:[]};
+ $('instructions').textContent='Touche un tube, puis un autre pour verser. Une couleur se verse sur la même couleur ou dans un tube vide.';
+ $('hint').onclick=()=>say('Les tubes vides servent de réserve. Tu peux annuler autant de fois que tu veux.');
+ render=()=>{
+   const wrap=el('div','tubes');
+   G.board.forEach((tube,i)=>{
+     const b=button('',()=>tapTube(i),'tube'+(G.selected===i?' selected':''));
+     b.setAttribute('aria-label','Tube '+(i+1)+' : '+
+       (tube.length?tube.map(c=>colorNames[c]).join(', '):'vide'));
+     b.setAttribute('aria-pressed',String(G.selected===i));
+     const glass=el('div','glass');
+     for(const color of tube){
+       const layer=el('div','layer',String(color+1));
+       layer.style.background=palette[color];glass.appendChild(layer);
+     }
+     b.append(glass,el('small','',String(i+1)));wrap.appendChild(b);
+   });
+   $('arena').replaceChildren(wrap);
+   $('metric').textContent=G.moves+' versements';
+   $('progress').textContent='Une couleur par tube';
+   $('undo').disabled=!G.history.length;
+ };
+ render();
+}
+function tapTube(index){
+ if(locked)return;
+ if(G.selected===index){G.selected=-1;render();return}
+ if(G.selected<0){
+   if(!G.board[index].length){say('Choisis d’abord un tube qui contient une couleur.');return}
+   G.selected=index;render();say('Choisis le tube de destination.');return;
+ }
+ const next=copy(G.board);
+ if(!pour(next,G.selected,index)){
+   say('Ce versement ne passe pas : vérifie la couleur du dessus et la place disponible.');return;
+ }
+ recordHistory();G.board=next;G.moves++;G.selected=-1;render();say('');
+ if(G.board.every(t=>!t.length||t.length===4&&t.every(c=>c===t[0])))win();
+}
+
+/* PARKING : configurations mélangées par déplacements légaux. */
+function carCells(car){
+ const out=[];
+ for(let k=0;k<car.len;k++)
+   out.push((car.y+(car.axis==='v'?k:0))*6+car.x+(car.axis==='h'?k:0));
+ return out;
+}
+function carMove(board,index,delta){
+ const car=board[index],sign=Math.sign(delta);
+ const occupied=new Set(board.flatMap((c,i)=>i===index?[]:carCells(c)));
+ let moved=0;
+ for(let k=0;k<Math.abs(delta);k++){
+   const next={...car,x:car.x+(car.axis==='h'?sign:0),y:car.y+(car.axis==='v'?sign:0)};
+   if(next.x<0||next.y<0||
+      next.x+(next.axis==='h'?next.len:1)>6||
+      next.y+(next.axis==='v'?next.len:1)>6||
+      carCells(next).some(p=>occupied.has(p)))break;
+   Object.assign(car,next);moved+=sign;
+ }
+ return moved;
+}
+function parkingCandidate(lv,attempt){
+ const r=rng(lv+912+attempt*7919),board=[{x:4,y:2,len:2,axis:'h'}];
+ for(let tries=0;board.length<Math.min(11,4+Math.floor(lv/2))&&tries<700;tries++){
+   const axis=r()<.5?'h':'v',len=r()<.2?3:2;
+   const car={axis,len,x:Math.floor(r()*(axis==='h'?7-len:6)),
+     y:Math.floor(r()*(axis==='v'?7-len:6))};
+   const cells=carCells(car);
+   if(cells.some(p=>Math.floor(p/6)===2)||
+      cells.some(p=>board.some(c=>carCells(c).includes(p))))continue;
+   board.push(car);
+ }
+ carMove(board,0,-4);
+ for(let k=0;k<45+lv*8;k++){
+   const i=1+Math.floor(r()*(board.length-1));
+   carMove(board,i,(r()<.5?-1:1)*(1+Math.floor(r()*3)));
+ }
+ return board;
+}
+function parkingLevel(lv){
+ for(let attempt=0;attempt<50;attempt++){
+   const board=parkingCandidate(lv,attempt);
+   if(carMove(copy(board),0,4)!==4)return board;
+ }
+ return[{x:0,y:2,len:2,axis:'h'},{x:3,y:1,len:2,axis:'v'}];
+}
+function initParking(){
+ G={board:parkingLevel(level),moves:0,selected:0,history:[]};
+ $('instructions').textContent='Libère la voiture rouge vers la droite. Glisse les véhicules, ou sélectionne-en un et utilise les boutons.';
+ $('hint').onclick=()=>say('Les véhicules avancent uniquement dans leur axe. Commence par ceux qui bloquent la ligne de la voiture rouge.');
+ const board=el('div','square parking');
+ const arrows=el('div','car-buttons');
+ const controls=[
+   ['←',-1,'h'],['→',1,'h'],['↑',-1,'v'],['↓',1,'v']
+ ];
+ for(const[label,delta,axis]of controls){
+   const b=button(label,()=>{
+     if(G.board[G.selected]?.axis===axis)moveCar(G.selected,delta);
+     else say('Ce véhicule se déplace dans l’autre direction.');
+   });
+   b.setAttribute('aria-label',{'←':'Gauche','→':'Droite','↑':'Haut','↓':'Bas'}[label]);
+   arrows.appendChild(b);
+ }
+ $('arena').append(el('div','exit','Sortie de la voiture rouge →'),board,arrows);
+ render=()=>{
+   board.replaceChildren();
+   G.board.forEach((car,i)=>{
+     const b=el('button','car'+(G.selected===i?' selected':''),i===0?'🚗':String(i));
+     b.style.background=i===0?'#f16681':palette[(i+1)%palette.length];
+     b.style.left='calc('+car.x/6*100+'% + 3px)';
+     b.style.top='calc('+car.y/6*100+'% + 3px)';
+     b.style.width='calc('+(car.axis==='h'?car.len:1)/6*100+'% - 6px)';
+     b.style.height='calc('+(car.axis==='v'?car.len:1)/6*100+'% - 6px)';
+     b.setAttribute('aria-label',(i===0?'Voiture rouge':'Véhicule '+i)+
+       ', '+(car.axis==='h'?'horizontal':'vertical'));
+     b.onpointerdown=e=>{
+       if(locked)return;
+       G.selected=i;b.setPointerCapture(e.pointerId);
+       drag={i,x:e.clientX,y:e.clientY,run:runId};
+     };
+     b.onpointerup=e=>{
+       if(!drag||drag.run!==runId)return;
+       const old=drag;drag=null;
+       const unit=board.getBoundingClientRect().width/6;
+       const distance=car.axis==='h'?e.clientX-old.x:e.clientY-old.y;
+       const delta=Math.round(distance/unit);
+       if(delta)moveCar(i,delta);else render();
+     };
+     b.onpointercancel=()=>{drag=null};
+     b.onclick=e=>{if(e.detail===0){G.selected=i;render()}};
+     board.appendChild(b);
+   });
+   $('metric').textContent=G.moves+' déplacements';
+   $('progress').textContent='Libère la voiture rouge';
+   $('undo').disabled=!G.history.length;
+ };
+ render();
+}
+function moveCar(index,delta){
+ if(locked)return;
+ const next=copy(G.board),moved=carMove(next,index,delta);
+ if(!moved){say('Le passage est bloqué. Déplace un autre véhicule.');return}
+ recordHistory();G.board=next;G.moves++;G.selected=index;render();say('');
+ if(G.board[0].x===4)win();
+}
+document.addEventListener('keydown',e=>{
+ if(mode!=='parking'||locked||$('levelDialog').open)return;
+ const car=G.board[G.selected];if(!car)return;
+ const moves={ArrowLeft:['h',-1],ArrowRight:['h',1],ArrowUp:['v',-1],ArrowDown:['v',1]};
+ const move=moves[e.key];
+ if(move&&move[0]===car.axis){e.preventDefault();moveCar(G.selected,move[1])}
+});
+
+/* BLOCS : partie libre, lignes et colonnes effacées ensemble. */
+const shapes=[
+ [[0,0]],[[0,0],[1,0]],[[0,0],[0,1]],
+ [[0,0],[1,0],[2,0]],[[0,0],[0,1],[0,2]],
+ [[0,0],[1,0],[0,1],[1,1]],
+ [[0,0],[0,1],[1,1]],[[0,0],[1,0],[1,1]],
+ [[0,0],[1,0],[2,0],[1,1]],
+ [[0,0],[1,0],[2,0],[3,0]],
+ [[0,0],[0,1],[0,2],[0,3]],
+ [[0,0],[1,0],[2,0],[0,1],[0,2]]
+];
+function newPieces(){
+ return Array.from({length:3},()=>({
+   cells:copy(shapes[Math.floor(Math.random()*shapes.length)]),
+   color:1+Math.floor(Math.random()*palette.length)
+ }));
+}
+function canPlace(shape,row,col){
+ return shape.every(([x,y])=>row+y>=0&&row+y<8&&col+x>=0&&col+x<8&&
+   !G.board[(row+y)*8+col+x]);
+}
+function clearLines(board){
+ const rows=[],cols=[];
+ for(let i=0;i<8;i++){
+   if(Array.from({length:8},(_,j)=>board[i*8+j]).every(Boolean))rows.push(i);
+   if(Array.from({length:8},(_,j)=>board[j*8+i]).every(Boolean))cols.push(i);
+ }
+ return{
+   board:board.map((v,i)=>rows.includes(Math.floor(i/8))||cols.includes(i%8)?0:v),
+   lines:rows.length+cols.length
+ };
+}
+function initBlocks(){
+ G={board:Array(64).fill(0),pieces:newPieces(),selected:-1,score:0};
+ $('instructions').textContent='Choisis une forme puis touche sa case de départ, ou glisse-la sur la grille. Remplis une ligne ou une colonne.';
+ const board=el('div','square cell-grid');board.style.gridTemplateColumns='repeat(8,1fr)';
+ const pieces=el('div','pieces');$('arena').append(board,pieces);
+ render=()=>{
+   board.replaceChildren();
+   G.board.forEach((value,i)=>{
+     const b=button('',()=>placeBlock(Math.floor(i/8),i%8),'cell'+(value?' filled':''));
+     b.setAttribute('aria-label','Ligne '+(1+Math.floor(i/8))+', colonne '+(1+i%8)+
+       (value?', occupée':', vide'));
+     if(value)b.style.background=palette[value-1];
+     board.appendChild(b);
+   });
+   pieces.replaceChildren();
+   G.pieces.forEach((piece,i)=>{
+     if(!piece){pieces.appendChild(el('div','piece','✓'));return}
+     const b=el('button','piece'+(G.selected===i?' selected':''));
+     b.setAttribute('aria-label','Forme '+(i+1)+', '+piece.cells.length+' cases');
+     const mini=el('div','mini');
+     const width=Math.max(...piece.cells.map(p=>p[0]))+1;
+     const height=Math.max(...piece.cells.map(p=>p[1]))+1;
+     mini.style.gridTemplateColumns='repeat('+width+',16px)';
+     for(let y=0;y<height;y++)for(let x=0;x<width;x++){
+       const part=el('span');
+       if(piece.cells.some(p=>p[0]===x&&p[1]===y))part.style.background=palette[piece.color-1];
+       mini.appendChild(part);
+     }
+     b.appendChild(mini);
+     b.onpointerdown=e=>{
+       if(locked)return;
+       b.setPointerCapture(e.pointerId);
+       const rect=mini.getBoundingClientRect(),unit=board.getBoundingClientRect().width/8;
+       const grabX=Math.max(0,Math.min(width-1,Math.floor((e.clientX-rect.left)/19)));
+       const grabY=Math.max(0,Math.min(height-1,Math.floor((e.clientY-rect.top)/19)));
+       drag={i,x:e.clientX,y:e.clientY,grabX,grabY,unit,run:runId,moved:false};
+       ghost=el('div','ghost');ghost.style.gridTemplateColumns='repeat('+width+','+(unit-4)+'px)';
+       for(let y=0;y<height;y++)for(let x=0;x<width;x++){
+         const part=el('span');part.style.width=part.style.height=(unit-4)+'px';
+         if(piece.cells.some(p=>p[0]===x&&p[1]===y))part.style.background=palette[piece.color-1];
+         ghost.appendChild(part);
+       }
+       ghost.style.display='none';document.body.appendChild(ghost);
+     };
+     b.onpointermove=e=>{
+       if(!drag||drag.run!==runId)return;
+       if(Math.hypot(e.clientX-drag.x,e.clientY-drag.y)<7&&!drag.moved)return;
+       drag.moved=true;ghost.style.display='grid';
+       ghost.style.left=(e.clientX-(drag.grabX+.5)*drag.unit)+'px';
+       ghost.style.top=(e.clientY-(drag.grabY+.5)*drag.unit)+'px';
+       const rect=board.getBoundingClientRect();
+       drag.col=Math.floor((e.clientX-rect.left)/drag.unit)-drag.grabX;
+       drag.row=Math.floor((e.clientY-rect.top)/drag.unit)-drag.grabY;
+       [...board.children].forEach(c=>c.classList.remove('preview'));
+       if(canPlace(piece.cells,drag.row,drag.col)){
+         for(const[x,y]of piece.cells)board.children[(drag.row+y)*8+drag.col+x].classList.add('preview');
+       }
+     };
+     b.onpointerup=()=>{
+       if(!drag||drag.run!==runId)return;
+       const old=drag;drag=null;ghost?.remove();ghost=null;
+       G.selected=i;
+       if(old.moved)placeBlock(old.row,old.col);else render();
+     };
+     b.onpointercancel=()=>{drag=null;ghost?.remove();ghost=null;render()};
+     b.onclick=e=>{if(e.detail===0){G.selected=i;render()}};
+     pieces.appendChild(b);
+   });
+   $('metric').textContent='Score '+G.score+' · Record '+progress.blockBest;
+   $('progress').textContent='Palier '+(1+Math.floor(G.score/100))+' · '+G.score%100+'/100';
+ };
+ render();
+}
+function placeBlock(row,col){
+ if(locked)return;
+ const piece=G.pieces[G.selected];
+ if(!piece){say('Choisis une forme en dessous de la grille.');return}
+ if(!Number.isInteger(row)||!Number.isInteger(col)||!canPlace(piece.cells,row,col)){
+   say('Cette forme ne tient pas ici. Essaie un autre emplacement.');render();return;
+ }
+ for(const[x,y]of piece.cells)G.board[(row+y)*8+col+x]=piece.color;
+ const result=clearLines(G.board);G.board=result.board;
+ G.score+=piece.cells.length+result.lines*20+(result.lines>1?10:0);
+ G.pieces[G.selected]=null;G.selected=-1;
+ if(G.pieces.every(p=>!p))G.pieces=newPieces();
+ if(G.score>progress.blockBest){progress.blockBest=G.score;save()}
+ render();say(result.lines?result.lines+' ligne(s) effacée(s) ! ✨':'Bien placé !');
+ const possible=G.pieces.filter(Boolean).some(p=>{
+   for(let row=0;row<8;row++)for(let col=0;col<8;col++)
+     if(canPlace(p.cells,row,col))return true;
+   return false;
+ });
+ if(!possible){
+   locked=true;$('resultIcon').textContent='🧩';
+   $('resultTitle').textContent='Belle partie !';
+   $('resultText').textContent=G.score+' points. Il ne reste plus de place pour les formes disponibles. Record : '+progress.blockBest+'.';
+   $('next').textContent='Choisir un autre jeu';$('result').showModal();
+ }
+}
+
+/* FLÈCHES : ajout dans l’ordre inverse d’une solution valide. */
+const dirs=[[0,-1],[1,0],[0,1],[-1,0]];
+const arrowSymbols=['↑','→','↓','←'];
+function rayFree(board,index,d,n){
+ let x=index%n,y=Math.floor(index/n);
+ const[dx,dy]=dirs[d];
+ for(x+=dx,y+=dy;x>=0&&y>=0&&x<n&&y<n;x+=dx,y+=dy)
+   if(board[y*n+x]!==null)return false;
+ return true;
+}
+function arrowLevel(lv){
+ const n=lv<5?6:8,r=rng(lv+42),board=Array(n*n).fill(null);
+ const wanted=Math.min(n*n-3,12+lv*2);
+ for(let k=0;k<wanted;k++){
+   const options=[];
+   for(let i=0;i<board.length;i++){
+     if(board[i]!==null)continue;
+     for(let d=0;d<4;d++)if(rayFree(board,i,d,n))options.push([i,d]);
+   }
+   if(!options.length)break;
+   const[i,d]=options[Math.floor(r()*options.length)];board[i]=d;
+ }
+ return{n,board};
+}
+function initArrows(){
+ const generated=arrowLevel(level);
+ G={...generated,moves:0,selected:-1,history:[],total:generated.board.filter(x=>x!==null).length};
+ $('instructions').textContent='Touche une flèche : elle sort si aucune autre flèche ne bloque sa direction. Vide tout le plateau.';
+ const board=el('div','square cell-grid');
+ board.style.gridTemplateColumns='repeat('+G.n+',1fr)';$('arena').appendChild(board);
+ $('hint').onclick=()=>{
+   const index=G.board.findIndex((d,i)=>d!==null&&rayFree(G.board,i,d,G.n));
+   if(index>=0){board.children[index].classList.add('hinted');say('Cette flèche peut sortir.')}
+ };
+ render=()=>{
+   board.replaceChildren();
+   G.board.forEach((d,i)=>{
+     const b=button(d===null?'':arrowSymbols[d],()=>tapArrow(i,b),'cell arrow');
+     b.disabled=d===null;
+     if(d===null){b.style.background='transparent';b.style.opacity='1'}
+     b.setAttribute('aria-label',d===null?'Case vide':'Flèche '+['haut','droite','bas','gauche'][d]);
+     board.appendChild(b);
+   });
+   const remaining=G.board.filter(x=>x!==null).length;
+   $('metric').textContent=remaining+' flèches restantes';
+   $('progress').textContent=G.total-remaining+' / '+G.total;
+   $('undo').disabled=!G.history.length;
+ };
+ render();
+}
+function tapArrow(index,b){
+ if(locked||G.board[index]===null)return;
+ const d=G.board[index];
+ if(!rayFree(G.board,index,d,G.n)){
+   b.classList.add('blocked');say('Une autre flèche bloque ce chemin.');
+   const token=runId;
+   setTimeout(()=>{if(token===runId)b.classList.remove('blocked')},400);return;
+ }
+ recordHistory();locked=true;
+ const token=runId,[dx,dy]=dirs[d];
+ b.style.transform='translate('+(dx*120)+'px,'+(dy*120)+'px)';
+ b.classList.add('gone');
+ setTimeout(()=>{
+   if(token!==runId)return;
+   G.board[index]=null;G.moves++;locked=false;render();say('');
+   if(G.board.every(x=>x===null))win();
+ },matchMedia('(prefers-reduced-motion: reduce)').matches?0:240);
+}
+
+/* CHEMINS : partition d’un parcours couvrant toute la grille. */
+function neighbours(index,n){
+ const x=index%n,y=Math.floor(index/n);
+ return[[x-1,y],[x+1,y],[x,y-1],[x,y+1]]
+   .filter(([x,y])=>x>=0&&y>=0&&x<n&&y<n).map(([x,y])=>y*n+x);
+}
+function flowLevel(lv){
+ const n=lv<6?5:6,r=rng(lv+132),pairs=Math.min(6,3+Math.floor(lv/4));
+ let path=[];
+ for(let y=0;y<n;y++)for(let x=0;x<n;x++)path.push(y*n+(y%2?n-1-x:x));
+ for(let k=0;k<250;k++){
+   if(r()<.5){
+     const options=neighbours(path[0],n).map(i=>path.indexOf(i)).filter(i=>i>1);
+     if(options.length){
+       const j=options[Math.floor(r()*options.length)];
+       path=[...path.slice(0,j).reverse(),...path.slice(j)];
+     }
+   }else{
+     const options=neighbours(path.at(-1),n).map(i=>path.indexOf(i)).filter(i=>i<path.length-2);
+     if(options.length){
+       const j=options[Math.floor(r()*options.length)];
+       path=[...path.slice(0,j+1),...path.slice(j+1).reverse()];
+     }
+   }
+ }
+ const sizes=Array(pairs).fill(3);
+ for(let left=n*n-pairs*3;left>0;left--)sizes[Math.floor(r()*pairs)]++;
+ let offset=0;
+ const solutions=sizes.map(size=>{
+   const p=path.slice(offset,offset+size);offset+=size;return p;
+ });
+ return{n,solutions};
+}
+function initFlow(){
+ G={...flowLevel(level),paths:[],active:-1,history:[]};
+ G.paths=G.solutions.map(()=>[]);
+ G.endpoints={};
+ G.solutions.forEach((p,i)=>{G.endpoints[p[0]]=i;G.endpoints[p.at(-1)]=i});
+ $('instructions').textContent='Relie les points de même numéro sans croiser les chemins. Toutes les cases doivent être remplies. Glisse ou touche les cases une à une.';
+ const board=el('div','square cell-grid flow-board');
+ board.style.gridTemplateColumns='repeat('+G.n+',1fr)';
+ $('arena').appendChild(board);
+ let dragging=false;
+ function indexAt(e){
+   const rect=board.getBoundingClientRect();
+   const x=Math.floor((e.clientX-rect.left)/rect.width*G.n);
+   const y=Math.floor((e.clientY-rect.top)/rect.height*G.n);
+   return x>=0&&y>=0&&x<G.n&&y<G.n?y*G.n+x:null;
+ }
+ board.onpointerdown=e=>{
+   if(locked)return;
+   dragging=true;board.setPointerCapture(e.pointerId);
+   const index=indexAt(e);if(index!==null)visitFlow(index,true);
+ };
+ board.onpointermove=e=>{
+   if(!dragging||locked)return;
+   const index=indexAt(e);if(index===null||G.active<0)return;
+   const last=G.paths[G.active].at(-1);
+   const x=index%G.n,y=Math.floor(index/G.n),lx=last%G.n,ly=Math.floor(last/G.n);
+   if(x===lx||y===ly){
+     const step=x===lx?Math.sign(y-ly)*G.n:Math.sign(x-lx);
+     if(step)for(let p=last+step;;p+=step){
+       if(!visitFlow(p,false)||G.active<0||p===index)break;
+     }
+   }
+ };
+ board.onpointerup=()=>{dragging=false};
+ board.onpointercancel=()=>{dragging=false};
+ $('hint').onclick=flowHint;
+ render=()=>{
+   board.replaceChildren();
+   const owner=flowOwners();
+   for(let i=0;i<G.n*G.n;i++){
+     const b=el('button','cell flow-cell');
+     b.setAttribute('aria-label','Ligne '+(1+Math.floor(i/G.n))+', colonne '+(1+i%G.n)+
+       (G.endpoints[i]!==undefined?', point '+(G.endpoints[i]+1):''));
+     if(owner[i]!==undefined)b.style.background=palette[owner[i]]+'22';
+     if(G.endpoints[i]!==undefined){
+       const circle=el('span','endpoint',String(G.endpoints[i]+1));
+       circle.style.background=palette[G.endpoints[i]];b.appendChild(circle);
+     }
+     if(G.active>=0&&G.paths[G.active].at(-1)===i)b.classList.add('active');
+     b.onclick=e=>{if(e.detail===0)visitFlow(i,true)};
+     board.appendChild(b);
+   }
+   const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+   svg.setAttribute('viewBox','0 0 '+G.n*100+' '+G.n*100);
+   svg.setAttribute('aria-hidden','true');svg.classList.add('flow-line');
+   G.paths.forEach((path,i)=>{
+     if(path.length<2)return;
+     const line=document.createElementNS(svg.namespaceURI,'polyline');
+     line.setAttribute('points',path.map(p=>(p%G.n*100+50)+','+(Math.floor(p/G.n)*100+50)).join(' '));
+     line.setAttribute('fill','none');line.setAttribute('stroke',palette[i]);
+     line.setAttribute('stroke-width','24');line.setAttribute('stroke-linecap','round');
+     line.setAttribute('stroke-linejoin','round');svg.appendChild(line);
+   });
+   board.appendChild(svg);
+   const connected=G.paths.filter((p,i)=>isConnected(p,i)).length;
+   const filled=Object.keys(owner).length;
+   $('metric').textContent=connected+' / '+G.paths.length+' paires';
+   $('progress').textContent=filled+' / '+G.n*G.n+' cases';
+   $('undo').disabled=!G.history.length;
+ };
+ render();
+}
+function flowOwners(){
+ const owner={};
+ G.paths.forEach((p,i)=>p.forEach(cell=>owner[cell]=i));
+ for(const[cell,color]of Object.entries(G.endpoints))owner[cell]=color;
+ return owner;
+}
+function isConnected(path,color){
+ const solution=G.solutions[color];
+ return path.length>1&&
+   ((path[0]===solution[0]&&path.at(-1)===solution.at(-1))||
+    (path[0]===solution.at(-1)&&path.at(-1)===solution[0]));
+}
+function visitFlow(index,allowStart){
+ if(locked)return false;
+ const endpoint=G.endpoints[index];
+ if(allowStart&&endpoint!==undefined){
+   if(G.active!==endpoint||G.paths[endpoint].length<2||
+      index===G.paths[endpoint][0]){
+     recordHistory();G.active=endpoint;G.paths[endpoint]=[index];render();say('');return true;
+   }
+ }
+ if(G.active<0)return false;
+ const color=G.active,path=G.paths[color],last=path.at(-1);
+ if(index===last)return true;
+ if(!neighbours(last,G.n).includes(index))return false;
+ const owner=flowOwners();
+ if(owner[index]!==undefined&&owner[index]!==color)return false;
+ const old=path.indexOf(index);
+ if(old>=0)G.paths[color]=path.slice(0,old+1);
+ else path.push(index);
+ if(isConnected(G.paths[color],color))G.active=-1;
+ render();checkFlow();return true;
+}
+function checkFlow(){
+ const connected=G.paths.every((p,i)=>isConnected(p,i));
+ if(connected&&Object.keys(flowOwners()).length===G.n*G.n)win();
+ else if(connected)say('Toutes les paires sont reliées, mais il reste des cases vides. Ajuste les chemins.');
+}
+function flowHint(){
+ if(locked)return;
+ let color=G.paths.findIndex((p,i)=>!isConnected(p,i));
+ if(color<0)color=G.paths.findIndex((p,i)=>
+   JSON.stringify(p)!==JSON.stringify(G.solutions[i])&&
+   JSON.stringify([...p].reverse())!==JSON.stringify(G.solutions[i]));
+ if(color<0)return;
+ recordHistory();
+ const solution=G.solutions[color],used=new Set(solution);
+ G.paths=G.paths.map((p,i)=>i!==color&&p.some(cell=>used.has(cell))?[]:p);
+ G.paths[color]=[...solution];G.active=-1;render();
+ say('Un chemin a été montré. Les chemins qui le croisaient ont été effacés.');
+ checkFlow();
+}
+
+/* HORS LIGNE */
+if('serviceWorker' in navigator&&location.protocol!=='file:'){
+ navigator.serviceWorker.register('./sw.js')
+   .then(()=>navigator.serviceWorker.ready)
+   .then(()=>$('offline').textContent='Prêt hors ligne ✓')
+   .catch(()=>$('offline').textContent='Mode en ligne');
+}
+window.addEventListener('offline',()=>$('offline').textContent='Hors ligne');
+home();
+</script>
+</body>
+</html>
